@@ -14,6 +14,7 @@
 /** 侧栏打开后短窗内忽略遮罩点击，避免「发送」等操作后误触关闭 */
 var pourBackdropSuppressUntil = 0;
 var moodBgLoadToken = 0;
+var moodBgPreload = null;
 
 function ensureEnterPourMode(reason) {
     // 有些情况下 CoreApi 初始化慢，第一次点“倾诉”可能没切到倾诉态
@@ -151,9 +152,14 @@ function applyMoodBackgroundFallback(mood) {
                 function tryLoad() {
                     tries++;
                     var img = new Image();
+                    // 保持引用，避免被 GC 导致请求中断/误判失败
+                    if (!moodBgPreload) moodBgPreload = {};
+                    moodBgPreload[String(token)] = img;
                     img.onload = function () {
                         if (token !== moodBgLoadToken) return;
                         clearFailHint();
+                        // 释放引用
+                        if (moodBgPreload) delete moodBgPreload[String(token)];
                     };
                     img.onerror = function () {
                         if (token !== moodBgLoadToken) return;
@@ -162,6 +168,17 @@ function applyMoodBackgroundFallback(mood) {
                             return;
                         }
                         setFailHint();
+                        // 最终失败：回退到纯渐变，保证“有背景”
+                        var fallback = (window.MentalLightConfig &&
+                            window.MentalLightConfig.MOOD_BACKGROUND_IMAGES &&
+                            window.MentalLightConfig.MOOD_BACKGROUND_IMAGES[mood]) || '';
+                        // 如果配置本来就是 png/svg 路径，这里直接用一张轻量内联渐变兜底
+                        // （避免再次请求失败导致无限提示）
+                        if (layer) {
+                            layer.style.backgroundImage = 'none';
+                        }
+                        // 释放引用
+                        if (moodBgPreload) delete moodBgPreload[String(token)];
                     };
                     // 轻量 cache-bust：重试时追加参数，避免偶发缓存/连接中断
                     var u = abs;
