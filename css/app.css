@@ -1636,9 +1636,13 @@
 
         body.app-view-pour.mood-bg-on #mood-bg {
             opacity: 0.78 !important;
+            mix-blend-mode: normal !important;
+            filter: none !important;
         }
         body.app-view-pour.mood-calm.mood-bg-on #mood-bg {
             opacity: 0.86 !important;
+            mix-blend-mode: normal !important;
+            filter: none !important;
         }
 
         #ai-status .ai-mood-detected {
