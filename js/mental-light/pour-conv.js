@@ -413,19 +413,28 @@ async function handleEmotion() {
         }
         return;
     }
-    if (!window.MentalLightCoreApi || !window.MentalLightCoreApi.setMood) return;
-    window.MentalLightCoreApi.setMood(mood);
     const lines = window.MentalLightMood.statusLines[mood] || window.MentalLightMood.statusLines.calm;
     const moodZh = MOOD_ZH[mood] || mood;
-    statusEl.innerHTML =
-        '<span class="ai-mood-detected">感知情绪：<strong>' +
-        escapeHtml(moodZh) +
-        '</strong></span>' +
-        lines.main +
-        '<span class="hint">' +
-        escapeHtml(lines.hint) +
-        '</span>';
+
+    // 核心 API 可能在某些“半加载/切换时序”情况下还没就绪；
+    // 但用户至少应该看到“识别结果”和对话卡片，而不是一直卡在“分析中”。
+    if (statusEl) {
+        statusEl.innerHTML =
+            '<span class="ai-mood-detected">感知情绪：<strong>' +
+            escapeHtml(moodZh) +
+            '</strong></span>' +
+            lines.main +
+            '<span class="hint">' +
+            escapeHtml(lines.hint) +
+            '</span>';
+    }
     appendConvCard(raw, mood, lines.main, lines.hint);
+
+    if (window.MentalLightCoreApi && window.MentalLightCoreApi.setMood) {
+        window.MentalLightCoreApi.setMood(mood);
+    } else {
+        console.warn('MentalLightCoreApi.setMood not ready');
+    }
     input.value = '';
     setPourOpen(true);
     pourBackdropSuppressUntil = performance.now() + 480;
