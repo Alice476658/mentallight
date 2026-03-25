@@ -20,6 +20,19 @@ function setPourOpen(open) {
     const bd = document.getElementById('pour-backdrop');
     if (open) {
         pourBackdropSuppressUntil = performance.now() + 420;
+        // 兜底：如果侧栏打开但仍停留在 home，强制切换到倾诉场景（否则光之书 canvas 会盖住底图）
+        setTimeout(function () {
+            if (!document.body.classList.contains('pour-open')) return;
+            if (!document.body.classList.contains('app-view-home')) return;
+            var api = window.MentalLightCoreApi;
+            if (api && api.enterPourMode) {
+                try {
+                    api.enterPourMode();
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+        }, 60);
     }
     if (tab) {
         tab.setAttribute('aria-expanded', open ? 'true' : 'false');
@@ -72,6 +85,16 @@ function escapeHtml(s) {
 function applyMoodBackgroundFallback(mood) {
     // 背景切换兜底：即使 3D CoreApi 未及时就绪，也能切换 #mood-bg
     try {
+        // 优先让 scene-tree 内部真正进入倾诉态（切 appView、隐藏光之书、启用透明背景）
+        var api = window.MentalLightCoreApi;
+        if (api && api.enterPourMode && document.body.classList.contains('app-view-home')) {
+            try {
+                api.enterPourMode();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
         // 只要倾诉侧栏开着或处在倾诉视图，就允许切背景；必要时强制切到 app-view-pour
         if (!document.body.classList.contains('pour-open') && !document.body.classList.contains('app-view-pour')) return;
         document.body.classList.remove('app-view-home');
