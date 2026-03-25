@@ -16,6 +16,32 @@ var pourBackdropSuppressUntil = 0;
 var moodBgLoadToken = 0;
 var moodBgPreload = null;
 
+function fallbackGradientForMood(mood) {
+    // 纯 CSS 渐变兜底：即使大图加载失败也不会“黑屏/没背景”
+    switch (mood) {
+        case 'joy':
+            return 'radial-gradient(ellipse 85% 65% at 40% 30%, rgba(240,168,216,0.92), rgba(110,184,232,0.55) 35%, rgba(26,40,64,0.95) 100%)';
+        case 'angry':
+            return 'radial-gradient(ellipse 90% 75% at 50% 70%, rgba(92,32,24,0.85), rgba(26,8,6,0.92) 75%, rgba(8,4,4,0.98) 100%)';
+        case 'anxious':
+            return 'linear-gradient(135deg, rgba(58,40,96,0.9) 0%, rgba(26,20,48,0.92) 50%, rgba(12,8,32,0.98) 100%)';
+        case 'fearful':
+            return 'radial-gradient(ellipse 70% 60% at 50% 40%, rgba(26,48,80,0.82) 0%, rgba(2,4,8,0.98) 100%)';
+        case 'warm':
+            return 'radial-gradient(ellipse 85% 70% at 50% 60%, rgba(106,64,80,0.82) 0%, rgba(18,12,16,0.98) 100%)';
+        case 'jealous':
+            return 'linear-gradient(135deg, rgba(18,34,28,0.92) 0%, rgba(36,56,44,0.86) 45%, rgba(26,18,40,0.96) 100%)';
+        case 'tired':
+            return 'linear-gradient(180deg, rgba(66,64,56,0.92) 0%, rgba(26,28,30,0.96) 60%, rgba(10,14,18,0.99) 100%)';
+        case 'sad':
+            return 'linear-gradient(180deg, rgba(61,79,98,0.86) 0%, rgba(26,36,48,0.92) 55%, rgba(10,14,20,0.98) 100%)';
+        case 'hopeful':
+            return 'linear-gradient(180deg, rgba(232,200,120,0.7) 0%, rgba(90,120,144,0.75) 40%, rgba(18,24,32,0.95) 100%)';
+        default:
+            return 'radial-gradient(ellipse 90% 65% at 30% 25%, rgba(78,184,216,0.72), rgba(26,58,88,0.78) 42%, rgba(5,10,18,0.98) 100%)';
+    }
+}
+
 function ensureEnterPourMode(reason) {
     // 有些情况下 CoreApi 初始化慢，第一次点“倾诉”可能没切到倾诉态
     var tries = 0;
@@ -149,6 +175,11 @@ function applyMoodBackgroundFallback(mood) {
                         escapeHtml(clean) +
                         '</span>';
                 }
+                function setFallbackHint() {
+                    if (!st) return;
+                    clearFailHint();
+                    st.innerHTML = st.innerHTML + '<span class="hint">已切换备用背景</span>';
+                }
                 function tryLoad() {
                     tries++;
                     var img = new Image();
@@ -168,15 +199,17 @@ function applyMoodBackgroundFallback(mood) {
                             return;
                         }
                         setFailHint();
-                        // 最终失败：回退到纯渐变，保证“有背景”
-                        var fallback = (window.MentalLightConfig &&
-                            window.MentalLightConfig.MOOD_BACKGROUND_IMAGES &&
-                            window.MentalLightConfig.MOOD_BACKGROUND_IMAGES[mood]) || '';
-                        // 如果配置本来就是 png/svg 路径，这里直接用一张轻量内联渐变兜底
-                        // （避免再次请求失败导致无限提示）
+                        // 最终失败：回退到纯渐变，保证“有背景”，并提示已切换备用
                         if (layer) {
-                            layer.style.backgroundImage = 'none';
+                            layer.style.backgroundImage = fallbackGradientForMood(mood);
+                            layer.style.backgroundSize = 'cover';
+                            layer.style.backgroundPosition = 'center';
+                            layer.style.backgroundRepeat = 'no-repeat';
                         }
+                        setTimeout(function () {
+                            if (token !== moodBgLoadToken) return;
+                            setFallbackHint();
+                        }, 0);
                         // 释放引用
                         if (moodBgPreload) delete moodBgPreload[String(token)];
                     };
