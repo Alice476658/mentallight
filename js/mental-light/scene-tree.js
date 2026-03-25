@@ -258,11 +258,10 @@ function setSceneMood(mood) {
     scene.fog = new THREE.Fog(p.fog, p.near * (inPour ? 1.05 : 0.92), p.far * (inPour ? 1.35 : 1.1));
     renderer.setClearColor(new THREE.Color(p.fog), 0);
     scene.background = null;
-    // 倾诉态让粒子更“看得见”（之前为配合底图偏暗）
-    mat.size = p.size * (inPour ? 1.18 : 1);
+    // 倾诉态让粒子强一些（回归“明显特效”）
+    mat.size = p.size * (inPour ? 1.35 : 1);
     const baseOp = Math.min(1, (p.opacity != null ? p.opacity : 0.92) * 1.06);
-    const pourDim = mood === 'calm' || mood === 'hopeful' ? 0.88 : 0.82;
-    mat.opacity = inPour ? baseOp * pourDim : baseOp;
+    mat.opacity = inPour ? Math.min(1, baseOp * 1.05) : baseOp;
     mat.blending = p.blending === 'normal' ? THREE.NormalBlending : THREE.AdditiveBlending;
     mat.map = mood === 'joy' ? texJoy : mood === 'sad' || mood === 'tired' ? texSad : texParticle;
     mat.needsUpdate = true;
@@ -998,6 +997,7 @@ function enterPourMode() {
         window.MentalLightDiary.closeDiaryModal();
     }
     appView = 'pour';
+    document.body.classList.remove('app-menu');
     document.body.classList.remove('app-view-home');
     document.body.classList.add('app-view-pour');
     const gh = document.getElementById('garden-home');
@@ -1025,27 +1025,19 @@ function enterPourMode() {
 }
 
 function backToGarden() {
-    appView = 'home';
+    // 回到“开始页菜单”，但仍保留粒子背景（不回光之书）
+    appView = 'pour';
+    document.body.classList.add('app-menu');
     syncPourPanelOpen(false);
     document.body.classList.remove('app-view-pour');
-    document.body.classList.add('app-view-home');
+    document.body.classList.add('app-view-pour');
     const gh = document.getElementById('garden-home');
     if (gh) gh.setAttribute('aria-hidden', 'false');
-    points.visible = false;
-    bookApi.group.visible = true;
-    scene.fog = null;
-    renderer.setClearColor(0x000000, 1);
-    camera.position.set(0, 0.25, 12.2);
-    controls.target.set(0, 0.45, 0);
-    controls.autoRotateSpeed = 0.14;
-    {
-        const p = moodPalettes[currentMood] || moodPalettes.calm;
-        mat.opacity = Math.min(1, (p.opacity != null ? p.opacity : 0.92) * 1.06);
-        mat.needsUpdate = true;
-    }
+    points.visible = true;
+    bookApi.group.visible = false;
+    renderer.setClearColor(0x000000, 0);
+    setMood(currentMood);
     applyBodyTheme(currentMood);
-    scheduleTreeRebuild();
-    updateGardenStatusPill();
 }
 
 function onCanvasPointerDown(e) {

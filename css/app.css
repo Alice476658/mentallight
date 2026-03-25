@@ -1146,7 +1146,8 @@
             mix-blend-mode: normal !important;
             filter: none !important;
         }
-        body.app-view-pour #garden-home {
+        /* 倾诉态默认隐藏花园菜单；加 app-menu 时作为首页按钮层显示 */
+        body.app-view-pour:not(.app-menu) #garden-home {
             display: none !important;
         }
         #garden-home {
