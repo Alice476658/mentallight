@@ -101,7 +101,13 @@ async function mockAIAnalyze(text) {
     const sample = String(text).trim().slice(0, 400);
     return new Promise((resolve) => {
         requestAnimationFrame(function () {
-            const mood = detectMood(sample);
+            let mood = 'calm';
+            try {
+                mood = detectMood(sample);
+            } catch (e) {
+                // 防止 detectMood 抛错导致 promise 永远不 resolve（“卡住在分析中”）
+                console.error(e);
+            }
             requestAnimationFrame(function () {
                 resolve(mood);
             });

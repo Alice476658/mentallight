@@ -402,7 +402,17 @@ async function handleEmotion() {
     }
 
     const raw = input.value.trim();
-    const mood = await window.MentalLightMood.mockAIAnalyze(raw);
+    let mood = 'calm';
+    try {
+        mood = await window.MentalLightMood.mockAIAnalyze(raw);
+    } catch (e) {
+        console.error(e);
+        if (statusEl) {
+            statusEl.innerHTML =
+                '分析失败（已捕获异常，请重试）。<span class="hint">已退出等待</span>';
+        }
+        return;
+    }
     if (!window.MentalLightCoreApi || !window.MentalLightCoreApi.setMood) return;
     window.MentalLightCoreApi.setMood(mood);
     const lines = window.MentalLightMood.statusLines[mood] || window.MentalLightMood.statusLines.calm;
