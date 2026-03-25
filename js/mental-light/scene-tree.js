@@ -258,9 +258,10 @@ function setSceneMood(mood) {
     scene.fog = new THREE.Fog(p.fog, p.near * (inPour ? 1.05 : 0.92), p.far * (inPour ? 1.35 : 1.1));
     renderer.setClearColor(new THREE.Color(p.fog), 0);
     scene.background = null;
-    mat.size = p.size;
+    // 倾诉态让粒子更“看得见”（之前为配合底图偏暗）
+    mat.size = p.size * (inPour ? 1.18 : 1);
     const baseOp = Math.min(1, (p.opacity != null ? p.opacity : 0.92) * 1.06);
-    const pourDim = mood === 'calm' || mood === 'hopeful' ? 0.7 : 0.63;
+    const pourDim = mood === 'calm' || mood === 'hopeful' ? 0.88 : 0.82;
     mat.opacity = inPour ? baseOp * pourDim : baseOp;
     mat.blending = p.blending === 'normal' ? THREE.NormalBlending : THREE.AdditiveBlending;
     mat.map = mood === 'joy' ? texJoy : mood === 'sad' || mood === 'tired' ? texSad : texParticle;
