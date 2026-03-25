@@ -53,16 +53,16 @@
         QUOTE_LIKES_STORAGE_KEY: 'mentallight_quote_likes_v1',
         MOOD_BACKGROUND_IMAGES: {
             // 优先使用 assets 里的摄影/插画底图；若你删了图片，仍有 SVG 兜底（色彩不会断层）
-            calm: 'assets/bg-calm-sea.png',
+            calm: '/assets/bg-calm-sea.png',
             sad: MOOD_BG_FALLBACK.sad,
-            angry: 'assets/bg-angry-volcano.png',
-            joy: 'assets/bg-joy-spiral.png',
-            anxious: 'assets/bg-anxious.png',
-            tired: 'assets/bg-tired.svg',
+            angry: '/assets/bg-angry-volcano.png',
+            joy: '/assets/bg-joy-spiral.png',
+            anxious: '/assets/bg-anxious.png',
+            tired: '/assets/bg-tired.svg',
             hopeful: MOOD_BG_FALLBACK.hopeful,
-            fearful: 'assets/bg-fearful-forest-rain.png',
-            warm: 'assets/bg-warm-water.png',
-            jealous: 'assets/bg-jealous.png'
+            fearful: '/assets/bg-fearful-forest-rain.png',
+            warm: '/assets/bg-warm-water.png',
+            jealous: '/assets/bg-jealous.png'
         }
     };
 })();

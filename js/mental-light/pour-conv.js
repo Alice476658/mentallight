@@ -85,7 +85,33 @@ function applyMoodBackgroundFallback(mood) {
         document.body.classList.toggle('mood-bg-on', !!imgUrl);
         if (layer) {
             if (imgUrl) {
-                layer.style.backgroundImage = 'url("' + String(imgUrl).replace(/"/g, '') + '")';
+                var clean = String(imgUrl).replace(/"/g, '');
+                var abs = '';
+                try {
+                    abs = new URL(clean, window.location.href).toString();
+                } catch (e) {
+                    abs = clean;
+                }
+                layer.style.backgroundImage = 'url("' + abs + '")';
+
+                // 无 DevTools 自检：预加载失败会在 ai-status 给提示
+                var st = document.getElementById('ai-status');
+                var img = new Image();
+                img.onload = function () {
+                    if (st && st.innerHTML.indexOf('背景图加载失败') >= 0) {
+                        st.innerHTML = st.innerHTML.replace(/<span class="hint">背景图加载失败.*?<\/span>/g, '');
+                    }
+                };
+                img.onerror = function () {
+                    if (st) {
+                        st.innerHTML =
+                            st.innerHTML +
+                            '<span class="hint">背景图加载失败：' +
+                            escapeHtml(clean) +
+                            '</span>';
+                    }
+                };
+                img.src = abs;
             } else {
                 layer.style.backgroundImage = 'none';
             }
