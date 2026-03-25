@@ -1136,8 +1136,15 @@
         body.app-view-home::after {
             display: none !important;
         }
-        body.app-view-home #mood-bg {
-            opacity: 0 !important;
+        body.app-view-pour.mood-bg-on #mood-bg {
+            opacity: 0.78 !important;
+            mix-blend-mode: normal !important;
+            filter: none !important;
+        }
+        body.app-view-pour.mood-calm.mood-bg-on #mood-bg {
+            opacity: 0.86 !important;
+            mix-blend-mode: normal !important;
+            filter: none !important;
         }
         body.app-view-pour #garden-home {
             display: none !important;
