@@ -606,9 +606,11 @@ async function handleEmotion() {
 var sendBtn = document.getElementById('send-btn');
 if (sendBtn) sendBtn.addEventListener('click', handleEmotion);
 const btnEnterPour = document.getElementById('btn-enter-pour');
-if (btnEnterPour && window.MentalLightCoreApi) {
+if (btnEnterPour) {
     btnEnterPour.addEventListener('click', function () {
-        if (window.MentalLightCoreApi.enterPourMode) window.MentalLightCoreApi.enterPourMode();
+        document.body.classList.remove('app-menu');
+        setPourOpen(true);
+        ensureEnterPourMode('btn-enter-pour');
     });
 }
 function bindBackToGarden(btn) {

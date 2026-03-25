@@ -1199,6 +1199,13 @@
             color: rgba(160, 190, 215, 0.45);
             letter-spacing: 0.06em;
         }
+        /* 菜单态精简文案，避免挡住背景图 */
+        body.app-menu .garden-prompt,
+        body.app-menu .garden-sub,
+        body.app-menu .garden-drawers-stack,
+        body.app-menu .garden-pill {
+            display: none !important;
+        }
         .garden-drawers-stack {
             pointer-events: auto;
             margin-top: 28px;
