@@ -13,6 +13,7 @@
 
 /** 侧栏打开后短窗内忽略遮罩点击，避免「发送」等操作后误触关闭 */
 var pourBackdropSuppressUntil = 0;
+var moodBgLoadToken = 0;
 
 function ensureEnterPourMode(reason) {
     // 有些情况下 CoreApi 初始化慢，第一次点“倾诉”可能没切到倾诉态
@@ -128,24 +129,48 @@ function applyMoodBackgroundFallback(mood) {
                 }
                 layer.style.backgroundImage = 'url("' + abs + '")';
 
-                // 无 DevTools 自检：预加载失败会在 ai-status 给提示
+                // 无 DevTools 自检：预加载失败会在 ai-status 给提示（带重试，避免网络抖动误报）
                 var st = document.getElementById('ai-status');
-                var img = new Image();
-                img.onload = function () {
+                var token = ++moodBgLoadToken;
+                var tries = 0;
+                var maxTries = 3;
+                function clearFailHint() {
                     if (st && st.innerHTML.indexOf('背景图加载失败') >= 0) {
                         st.innerHTML = st.innerHTML.replace(/<span class="hint">背景图加载失败.*?<\/span>/g, '');
                     }
-                };
-                img.onerror = function () {
-                    if (st) {
-                        st.innerHTML =
-                            st.innerHTML +
-                            '<span class="hint">背景图加载失败：' +
-                            escapeHtml(clean) +
-                            '</span>';
+                }
+                function setFailHint() {
+                    if (!st) return;
+                    clearFailHint();
+                    st.innerHTML =
+                        st.innerHTML +
+                        '<span class="hint">背景图加载失败：' +
+                        escapeHtml(clean) +
+                        '</span>';
+                }
+                function tryLoad() {
+                    tries++;
+                    var img = new Image();
+                    img.onload = function () {
+                        if (token !== moodBgLoadToken) return;
+                        clearFailHint();
+                    };
+                    img.onerror = function () {
+                        if (token !== moodBgLoadToken) return;
+                        if (tries < maxTries) {
+                            setTimeout(tryLoad, 350);
+                            return;
+                        }
+                        setFailHint();
+                    };
+                    // 轻量 cache-bust：重试时追加参数，避免偶发缓存/连接中断
+                    var u = abs;
+                    if (tries > 1) {
+                        u = abs + (abs.indexOf('?') >= 0 ? '&' : '?') + 'retry=' + tries + '&t=' + Date.now();
                     }
-                };
-                img.src = abs;
+                    img.src = u;
+                }
+                tryLoad();
             } else {
                 layer.style.backgroundImage = 'none';
             }
