@@ -14,25 +14,44 @@
 /** 侧栏打开后短窗内忽略遮罩点击，避免「发送」等操作后误触关闭 */
 var pourBackdropSuppressUntil = 0;
 
+function ensureEnterPourMode(reason) {
+    // 有些情况下 CoreApi 初始化慢，第一次点“倾诉”可能没切到倾诉态
+    var tries = 0;
+    var maxTries = 20; // ~1s
+    var tick = function () {
+        tries++;
+        if (!document.body.classList.contains('pour-open')) return;
+        if (document.body.classList.contains('app-view-pour')) return;
+        var api = window.MentalLightCoreApi;
+        if (api && api.enterPourMode) {
+            try {
+                api.enterPourMode();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        if (!document.body.classList.contains('app-view-pour') && tries < maxTries) {
+            setTimeout(tick, 50);
+        } else if (!document.body.classList.contains('app-view-pour')) {
+            var st = document.getElementById('ai-status');
+            if (st) {
+                st.innerHTML =
+                    '倾诉场景未进入（' +
+                    escapeHtml(reason || 'unknown') +
+                    '）。<span class="hint">请刷新或稍后重试</span>';
+            }
+        }
+    };
+    setTimeout(tick, 0);
+}
+
 function setPourOpen(open) {
     document.body.classList.toggle('pour-open', open);
     const tab = document.getElementById('pour-tab');
     const bd = document.getElementById('pour-backdrop');
     if (open) {
         pourBackdropSuppressUntil = performance.now() + 420;
-        // 兜底：如果侧栏打开但仍停留在 home，强制切换到倾诉场景（否则光之书 canvas 会盖住底图）
-        setTimeout(function () {
-            if (!document.body.classList.contains('pour-open')) return;
-            if (!document.body.classList.contains('app-view-home')) return;
-            var api = window.MentalLightCoreApi;
-            if (api && api.enterPourMode) {
-                try {
-                    api.enterPourMode();
-                } catch (e) {
-                    console.error(e);
-                }
-            }
-        }, 60);
+        ensureEnterPourMode('open-panel');
     }
     if (tab) {
         tab.setAttribute('aria-expanded', open ? 'true' : 'false');
@@ -85,15 +104,7 @@ function escapeHtml(s) {
 function applyMoodBackgroundFallback(mood) {
     // 背景切换兜底：即使 3D CoreApi 未及时就绪，也能切换 #mood-bg
     try {
-        // 优先让 scene-tree 内部真正进入倾诉态（切 appView、隐藏光之书、启用透明背景）
-        var api = window.MentalLightCoreApi;
-        if (api && api.enterPourMode && document.body.classList.contains('app-view-home')) {
-            try {
-                api.enterPourMode();
-            } catch (e) {
-                console.error(e);
-            }
-        }
+        ensureEnterPourMode('apply-bg');
 
         // 只要倾诉侧栏开着或处在倾诉视图，就允许切背景；必要时强制切到 app-view-pour
         if (!document.body.classList.contains('pour-open') && !document.body.classList.contains('app-view-pour')) return;
