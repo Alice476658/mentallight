@@ -69,6 +69,29 @@ function escapeHtml(s) {
         .replace(/"/g, '&quot;');
 }
 
+function applyMoodBackgroundFallback(mood) {
+    // 背景切换兜底：即使 3D CoreApi 未及时就绪，也能切换 #mood-bg
+    try {
+        if (!document.body.classList.contains('app-view-pour')) return;
+        var cfg = window.MentalLightConfig;
+        var layer = document.getElementById('mood-bg');
+        var imgUrl = cfg && cfg.MOOD_BACKGROUND_IMAGES ? cfg.MOOD_BACKGROUND_IMAGES[mood] : '';
+        var moods = ['calm', 'sad', 'angry', 'joy', 'anxious', 'tired', 'hopeful', 'fearful', 'warm', 'jealous'];
+        for (var i = 0; i < moods.length; i++) document.body.classList.remove('mood-' + moods[i]);
+        document.body.classList.add('mood-' + (mood || 'calm'));
+        document.body.classList.toggle('mood-bg-on', !!imgUrl);
+        if (layer) {
+            if (imgUrl) {
+                layer.style.backgroundImage = 'url("' + String(imgUrl).replace(/"/g, '') + '")';
+            } else {
+                layer.style.backgroundImage = 'none';
+            }
+        }
+    } catch (e) {
+        console.error(e);
+    }
+}
+
 var restoringConv = false;
 
 function persistConvCards() {
@@ -429,6 +452,7 @@ async function handleEmotion() {
             '</span>';
     }
     appendConvCard(raw, mood, lines.main, lines.hint);
+    applyMoodBackgroundFallback(mood);
 
     if (window.MentalLightCoreApi && window.MentalLightCoreApi.setMood) {
         window.MentalLightCoreApi.setMood(mood);
