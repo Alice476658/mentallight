@@ -99,19 +99,31 @@ async function mockAIAnalyze(text) {
         el.innerHTML = '微光正在感知你的情绪…<span class="hint">分析中</span>';
     }
     const sample = String(text).trim().slice(0, 400);
+    // 线上偶发“卡死在分析中”（requestAnimationFrame 没触发/被节流）。
+    // 这里改成 setTimeout，并加硬超时兜底，确保一定 resolve。
     return new Promise((resolve) => {
-        requestAnimationFrame(function () {
+        let done = false;
+        function finish(mood) {
+            if (done) return;
+            done = true;
+            resolve(mood);
+        }
+
+        // 正常路径：下一轮宏任务
+        setTimeout(function () {
             let mood = 'calm';
             try {
                 mood = detectMood(sample);
             } catch (e) {
-                // 防止 detectMood 抛错导致 promise 永远不 resolve（“卡住在分析中”）
                 console.error(e);
             }
-            requestAnimationFrame(function () {
-                resolve(mood);
-            });
-        });
+            finish(mood);
+        }, 0);
+
+        // 兜底：2s 后无论如何返回，避免“分析中”永久不动
+        setTimeout(function () {
+            finish('calm');
+        }, 2000);
     });
 }
 
