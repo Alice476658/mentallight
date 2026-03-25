@@ -24,7 +24,8 @@
     var C = window.MentalLightConfig;
     var N = C.N;
 let currentMood = 'calm';
-let appView = 'home';
+// 默认直接进入“倾诉粒子场”，不显示光之书
+let appView = 'pour';
 function syncPourPanelOpen(open) {
     const ui = window.MentalLightPourUi;
     if (ui && typeof ui.setPourOpen === 'function') {
@@ -981,6 +982,15 @@ controls.target.set(0, 0.45, 0);
 controls.autoRotateSpeed = 0.14;
 scheduleTreeRebuild();
 updateGardenStatusPill();
+
+// 启动时直接进入倾诉态（粒子+背景），隐藏光之书
+document.body.classList.remove('app-view-home');
+document.body.classList.add('app-view-pour');
+points.visible = true;
+bookApi.group.visible = false;
+setMood(currentMood);
+applyBodyTheme(currentMood);
+renderer.setClearColor(0x000000, 0);
 
 function enterPourMode() {
     if (window.MentalLightDiary && window.MentalLightDiary.closeDiaryModal) {
