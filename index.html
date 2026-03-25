@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>心绪微光 - AI 情感交互空间</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <link rel="stylesheet" href="css/app.css?v=20260325_02">
+</head>
+<body class="mood-calm app-view-home">
+
+<div id="ml-boot-error" class="ml-boot-error" hidden></div>
+<div id="mood-bg" aria-hidden="true"></div>
+
+<aside id="literary-quote-panel" class="literary-quote-panel" aria-label="世界名著语录">
+    <div class="literary-quote-panel-inner">
+        <div class="literary-quote-kicker">世界名著 · 语录</div>
+        <p class="literary-quote-zh" id="literary-quote-zh"></p>
+        <p class="literary-quote-en" id="literary-quote-en" lang="en"></p>
+        <p class="literary-quote-meta" id="literary-quote-meta"></p>
+        <div class="literary-quote-actions">
+            <button type="button" id="literary-quote-shuffle" class="literary-quote-btn" title="换一句">换一句</button>
+            <button type="button" id="literary-quote-copy" class="literary-quote-btn" title="复制中英文摘录">摘录</button>
+            <button type="button" id="literary-quote-like" class="literary-quote-btn literary-quote-like" aria-pressed="false" title="点赞收藏">♥ 点赞</button>
+        </div>
+    </div>
+</aside>
+
+<div id="garden-home" aria-hidden="false">
+    <div class="garden-brand">心绪微光 · 灵感花园</div>
+    <p class="garden-pill" id="garden-status-pill">光之书 0% · 去倾诉或写日记，让微光更盛</p>
+    <p class="garden-pill" id="garden-diary-stars-pill" style="margin-top: 6px; font-size: 0.68rem; letter-spacing: 0.06em">累计获得星星 ★ 0</p>
+    <p class="garden-prompt">说说你此刻的心事吧…</p>
+    <p class="garden-sub">来模拟心绪的发散与聚拢</p>
+    <div class="garden-drawers-stack" aria-label="语录与日记">
+        <details class="garden-diary-drawer garden-quote-fav-drawer" id="garden-quote-fav-drawer">
+            <summary>名著语录收藏 <span id="quote-fav-count-badge" class="garden-diary-badge"></span></summary>
+            <div class="garden-diary-body garden-quote-fav-body">
+                <input type="search" id="quote-fav-search" class="quote-fav-search" placeholder="搜索语录、书名、作者…" autocomplete="off" aria-label="搜索收藏的语录">
+                <div id="quote-fav-list" class="quote-fav-list" aria-label="已点赞语录列表"></div>
+            </div>
+        </details>
+        <details class="garden-diary-drawer" id="garden-diary-drawer">
+            <summary>花园日记 <span id="diary-count-badge" class="garden-diary-badge"></span></summary>
+            <div class="garden-diary-body">
+                <div id="diary-cards-container" class="diary-cards" aria-label="日记卡片列表"></div>
+            </div>
+        </details>
+    </div>
+    <div class="garden-enter-wrap">
+        <div class="garden-btn-row">
+            <button type="button" id="btn-open-diary">写日记</button>
+            <button type="button" id="btn-enter-pour">进入倾诉</button>
+        </div>
+    </div>
+</div>
+<div id="diary-modal-backdrop" aria-hidden="true"></div>
+<div id="diary-modal" role="dialog" aria-modal="true" aria-labelledby="diary-modal-title" aria-hidden="true">
+    <div class="diary-modal-inner">
+        <div class="diary-modal-top">
+            <h2 class="diary-modal-title" id="diary-modal-title">写一篇小记</h2>
+            <button type="button" id="diary-modal-close" aria-label="关闭">×</button>
+        </div>
+        <div class="diary-stars-row">
+            <span>本篇：</span>
+            <span class="diary-session-stars-wrap" id="diary-session-stars" aria-live="polite"></span>
+            <span class="diary-total-stars">累计获得 ★ <span id="diary-stars-total-num">0</span></span>
+        </div>
+        <textarea id="diary-textarea" placeholder="像平常写日记一样写下来…（每满 100 字会出现一颗小星星，本篇从 0 开始计）" maxlength="12000"></textarea>
+        <div class="diary-char-hint">约 <span id="diary-char-count">0</span> 字 · 每 100 字 1 星</div>
+        <div class="diary-img-toolbar">
+            <label class="diary-img-label">导入图片
+                <input type="file" id="diary-img-input" accept="image/*" multiple>
+            </label>
+            <span style="font-size:0.65rem;opacity:0.55">最多 6 张，自动压缩</span>
+        </div>
+        <div class="diary-img-preview" id="diary-img-preview"></div>
+        <div class="diary-modal-footer">
+            <button type="button" id="diary-cancel">取消</button>
+            <button type="button" id="diary-save">写完生成卡片</button>
+        </div>
+    </div>
+</div>
+
+<button type="button" id="pour-tab" aria-expanded="false" aria-controls="pour-panel" title="打开或收起倾诉">倾诉</button>
+<div id="pour-backdrop" aria-hidden="true"></div>
+<aside id="pour-panel" role="dialog" aria-modal="true" aria-label="倾诉与情绪感知">
+    <div id="pour-panel-inner">
+        <div id="chat-container">
+            <div class="panel-frame">
+                <div class="panel-body">
+                    <div class="panel-ribbon" aria-hidden="true"></div>
+                    <div class="panel-brand">心绪微光 · Mood</div>
+                    <div class="pour-top-actions">
+                        <button type="button" class="btn-back-garden" id="btn-back-garden">返回灵感花园</button>
+                        <button type="button" class="btn-end-pour" id="btn-end-pour" title="结束倾诉并回到首页">结束倾诉</button>
+                    </div>
+                    <div id="ai-status">
+                        你好，我是微光。把你的心事告诉我…
+                        <span class="hint">支持：平静 · 难过/难受 · 愤怒 · 嫉妒 · 愉悦 · 焦虑 · 疲惫 · 期待 · 紧张/恐惧 · 温情</span>
+                    </div>
+                    <div id="input-area">
+                        <input type="text" id="emotion-input" placeholder="输入你的心情，比如：我很焦虑…" autocomplete="off">
+                        <button type="button" id="send-btn">发送</button>
+                    </div>
+                    <div class="pour-diary-wrap">
+                        <button type="button" id="btn-pour-diary" class="btn-pour-diary">写心情日记</button>
+                        <span class="pour-diary-hint">当前心情会使用对应日记本外观</span>
+                    </div>
+                    <details class="conv-drawer" id="conv-drawer">
+                        <summary>
+                            <span>对话卡片</span>
+                            <span id="conv-count" class="conv-count-badge"></span>
+                        </summary>
+                        <div class="conv-drawer-body">
+                            <div class="conv-toolbar" id="conv-toolbar" hidden>
+                                <button type="button" class="conv-tool-btn" id="conv-select-all">全选</button>
+                                <button type="button" class="conv-tool-btn" id="conv-delete-sel" disabled>删除所选</button>
+                                <button type="button" class="conv-tool-btn conv-tool-danger" id="conv-clear-all">清空全部</button>
+                            </div>
+                            <div id="conv-cards" class="conv-cards" aria-label="对话摘录列表"></div>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+</aside>
+<script src="js/mental-light/config.js?v=20260325_02"></script>
+<script src="js/mental-light/mood-detect.js?v=20260325_02"></script>
+<script src="js/mental-light/garden-diary.js?v=20260325_02"></script>
+<script src="js/mental-light/book-of-light.js?v=20260325_02"></script>
+<script src="js/mental-light/scene-tree.js?v=20260325_02"></script>
+<script src="js/mental-light/literary-quotes.js?v=20260325_02"></script>
+<script src="js/mental-light/pour-conv.js?v=20260325_02"></script>
+</body>
+</html>

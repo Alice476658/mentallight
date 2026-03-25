@@ -1,0 +1,10 @@
+body { margin: 0; background: #000; overflow: hidden; font-family: "Microsoft YaHei", sans-serif; }
+#ui-overlay {
+    position: absolute; bottom: 5%; left: 50%; transform: translateX(-50%);
+    width: 400px; padding: 20px; border-radius: 20px;
+    background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2); text-align: center;
+}
+input { width: 70%; padding: 10px; border-radius: 8px; border: none; background: rgba(0,0,0,0.5); color: #fff; }
+button { padding: 10px 20px; border-radius: 8px; border: none; background: #00ffcc; cursor: pointer; font-weight: bold; }
+#ai-status { color: #00ffcc; margin-bottom: 10px; font-size: 14px; }

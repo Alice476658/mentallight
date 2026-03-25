@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="jg" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#0a1410"/>
+      <stop offset="40%" stop-color="#061208"/>
+      <stop offset="100%" stop-color="#020403"/>
+    </linearGradient>
+    <radialGradient id="jr" cx="50%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="#1a3028" stop-opacity="0.55"/>
+      <stop offset="70%" stop-color="#0c1814" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#040806" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="jf" x="-8%" y="-8%" width="116%" height="116%">
+      <feGaussianBlur stdDeviation="22"/>
+    </filter>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#jg)"/>
+  <ellipse cx="960" cy="520" rx="880" ry="520" fill="url(#jr)"/>
+  <!-- twisted ripple rings -->
+  <g opacity="0.22" fill="none" stroke="#2a5044" stroke-width="2" filter="url(#jf)">
+    <ellipse cx="960" cy="540" rx="420" ry="280" transform="rotate(-8 960 540)"/>
+    <ellipse cx="980" cy="560" rx="520" ry="340" transform="rotate(12 980 560)"/>
+    <ellipse cx="940" cy="520" rx="640" ry="400" transform="rotate(-5 940 520)"/>
+  </g>
+  <g opacity="0.14" fill="none" stroke="#3a4080" stroke-width="1.5" filter="url(#jf)">
+    <ellipse cx="1020" cy="480" rx="380" ry="520" transform="rotate(22 1020 480)"/>
+    <ellipse cx="900" cy="600" rx="440" ry="360" transform="rotate(-18 900 600)"/>
+  </g>
+  <rect width="1920" height="1080" fill="#080c0a" opacity="0.35"/>
+</svg>

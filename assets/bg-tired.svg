@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="gSky" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#5c6670"/>
+      <stop offset="45%" stop-color="#3d4348"/>
+      <stop offset="100%" stop-color="#1e2228"/>
+    </linearGradient>
+    <radialGradient id="gGlow" cx="50%" cy="42%" r="55%">
+      <stop offset="0%" stop-color="#c8c4b8" stop-opacity="0.35"/>
+      <stop offset="55%" stop-color="#8a8580" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#2a2c30" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gPath" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#3a3532"/>
+      <stop offset="100%" stop-color="#1a1816"/>
+    </linearGradient>
+    <filter id="blurMist" x="-5%" y="-5%" width="110%" height="110%">
+      <feGaussianBlur stdDeviation="28" result="b"/>
+      <feColorMatrix in="b" type="matrix"
+        values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.85 0"/>
+    </filter>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#gSky)"/>
+  <ellipse cx="960" cy="420" rx="780" ry="340" fill="url(#gGlow)"/>
+  <!-- distant path (perspective) -->
+  <path fill="url(#gPath)" opacity="0.92"
+    d="M960 1080 L1040 420 L880 420 Z"/>
+  <path fill="#252220" opacity="0.88"
+    d="M880 420 L1040 420 L1020 380 L900 380 Z"/>
+  <path fill="#1c1a18" opacity="0.9"
+    d="M900 380 L1020 380 L1008 348 L912 348 Z"/>
+  <!-- side banks -->
+  <path fill="#2e2a26" opacity="0.75"
+    d="M0 1080 L0 380 Q420 520 880 420 L880 1080 Z"/>
+  <path fill="#2e2a26" opacity="0.75"
+    d="M1920 1080 L1920 380 Q1500 520 1040 420 L1040 1080 Z"/>
+  <!-- tree silhouettes left -->
+  <g fill="#141210" opacity="0.88">
+    <path d="M120 1080 L180 320 L140 320 L100 520 L80 320 L40 320 L100 1080 Z"/>
+    <path d="M280 1080 L340 260 L300 260 L260 480 L220 260 L180 260 L240 1080 Z"/>
+    <path d="M420 1080 L480 380 L440 380 L400 560 L360 380 L320 380 L380 1080 Z"/>
+    <path d="M560 1080 L620 340 L580 340 L540 520 L500 340 L460 340 L520 1080 Z"/>
+  </g>
+  <!-- tree silhouettes right -->
+  <g fill="#141210" opacity="0.88">
+    <path d="M1800 1080 L1740 300 L1780 300 L1820 500 L1840 300 L1880 300 L1820 1080 Z"/>
+    <path d="M1640 1080 L1580 280 L1620 280 L1660 460 L1700 280 L1740 280 L1680 1080 Z"/>
+    <path d="M1500 1080 L1440 360 L1480 360 L1520 540 L1560 360 L1600 360 L1540 1080 Z"/>
+    <path d="M1360 1080 L1300 320 L1340 320 L1380 500 L1420 320 L1460 320 L1400 1080 Z"/>
+  </g>
+  <!-- mist layers -->
+  <ellipse cx="960" cy="520" rx="920" ry="380" fill="#9a9a98" opacity="0.14" filter="url(#blurMist)"/>
+  <ellipse cx="960" cy="640" rx="1000" ry="420" fill="#b8b4ae" opacity="0.1" filter="url(#blurMist)"/>
+  <rect width="1920" height="1080" fill="#6a6864" opacity="0.12" filter="url(#blurMist)"/>
+  <!-- fallen leaves hint -->
+  <g fill="#6b5c48" opacity="0.25">
+    <ellipse cx="720" cy="920" rx="14" ry="6" transform="rotate(-25 720 920)"/>
+    <ellipse cx="1100" cy="860" rx="12" ry="5" transform="rotate(18 1100 860)"/>
+    <ellipse cx="900" cy="980" rx="11" ry="4" transform="rotate(40 900 980)"/>
+  </g>
+</svg>
