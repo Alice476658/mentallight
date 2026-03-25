@@ -72,7 +72,10 @@ function escapeHtml(s) {
 function applyMoodBackgroundFallback(mood) {
     // 背景切换兜底：即使 3D CoreApi 未及时就绪，也能切换 #mood-bg
     try {
-        if (!document.body.classList.contains('app-view-pour')) return;
+        // 只要倾诉侧栏开着或处在倾诉视图，就允许切背景；必要时强制切到 app-view-pour
+        if (!document.body.classList.contains('pour-open') && !document.body.classList.contains('app-view-pour')) return;
+        document.body.classList.remove('app-view-home');
+        document.body.classList.add('app-view-pour');
         var cfg = window.MentalLightConfig;
         var layer = document.getElementById('mood-bg');
         var imgUrl = cfg && cfg.MOOD_BACKGROUND_IMAGES ? cfg.MOOD_BACKGROUND_IMAGES[mood] : '';
