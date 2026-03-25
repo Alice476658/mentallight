@@ -2,7 +2,7 @@
 (function () {
     'use strict';
 
-    /** 内联 SVG 作全屏底图，避免 assets 缺失导致倾诉页纯黑 */
+    /** 内联 SVG 作兜底底图，避免 assets 缺失导致倾诉页纯黑 */
     function moodSvg(inner) {
         return (
             'data:image/svg+xml;charset=utf-8,' +
@@ -14,7 +14,7 @@
         );
     }
 
-    var MOOD_BG = {
+    var MOOD_BG_FALLBACK = {
         calm: moodSvg(
             '<defs><radialGradient id="mlbg" cx="32%" cy="20%" r="78%"><stop offset="0%" stop-color="#4eb8d8"/><stop offset="42%" stop-color="#1a3a58"/><stop offset="100%" stop-color="#050a12"/></radialGradient></defs>'
         ),
@@ -52,16 +52,17 @@
         DIARY_MAX_IMAGES: 6,
         QUOTE_LIKES_STORAGE_KEY: 'mentallight_quote_likes_v1',
         MOOD_BACKGROUND_IMAGES: {
-            calm: MOOD_BG.calm,
-            sad: MOOD_BG.sad,
-            angry: MOOD_BG.angry,
-            joy: MOOD_BG.joy,
-            anxious: MOOD_BG.anxious,
+            // 优先使用 assets 里的摄影/插画底图；若你删了图片，仍有 SVG 兜底（色彩不会断层）
+            calm: 'assets/bg-calm-sea.png',
+            sad: MOOD_BG_FALLBACK.sad,
+            angry: 'assets/bg-angry-volcano.png',
+            joy: 'assets/bg-joy-spiral.png',
+            anxious: 'assets/bg-anxious.png',
             tired: 'assets/bg-tired.svg',
-            hopeful: MOOD_BG.hopeful,
-            fearful: MOOD_BG.fearful,
-            warm: MOOD_BG.warm,
-            jealous: 'assets/bg-jealous.svg'
+            hopeful: MOOD_BG_FALLBACK.hopeful,
+            fearful: 'assets/bg-fearful-forest-rain.png',
+            warm: 'assets/bg-warm-water.png',
+            jealous: 'assets/bg-jealous.png'
         }
     };
 })();
