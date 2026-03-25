@@ -53,10 +53,22 @@ camera.position.set(0, 0.4, 10);
 controls.target.set(0, 0, 0);
 controls.enableDamping = true;
 controls.dampingFactor = 0.06;
+controls.enableZoom = true;
+controls.enablePan = false;
 controls.minDistance = 4;
 controls.maxDistance = 22;
 controls.autoRotate = true;
 controls.autoRotateSpeed = 0.35;
+
+// 确保滚轮缩放不被默认滚动吞掉
+renderer.domElement.addEventListener(
+    'wheel',
+    function (e) {
+        // OrbitControls 会处理缩放；这里阻止页面默认滚动
+        e.preventDefault();
+    },
+    { passive: false }
+);
 
 const raycaster = new THREE.Raycaster();
 
