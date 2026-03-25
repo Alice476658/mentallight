@@ -1118,6 +1118,13 @@ function animate() {
     requestAnimationFrame(animate);
     const dt = Math.min(clock.getDelta(), 0.1);
     const time = performance.now() * 0.001;
+    // 兜底：DOM 视图已切到倾诉，但内部 appView 仍停在 home，会导致光之书继续渲染并盖住底图
+    if (appView === 'home' && (document.body.classList.contains('app-view-pour') || document.body.classList.contains('pour-open'))) {
+        appView = 'pour';
+        points.visible = true;
+        bookApi.group.visible = false;
+        renderer.setClearColor(0x000000, 0);
+    }
     if (appView === 'home') {
         bookApi.step(dt, time);
         controls.update();
